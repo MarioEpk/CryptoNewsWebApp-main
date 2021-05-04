@@ -19,13 +19,14 @@ namespace DataAPIRequests.APIClients
         public string RedditAppId { get; set; }
         public string RedditAppSecret { get; set; }
         public string RedditRefreshToken { get; set; }
- 
+
         public CardanoRedditClient(ApplicationDbContext context)
         {
             _context = context;
             try
             {
                 LoadCredentials();
+                // Prerobit RedditClient na autofac
                 client = new RedditClient(appId: RedditAppId, appSecret: RedditAppSecret, refreshToken: RedditRefreshToken);
             }
             catch (TimeoutException exception)
@@ -54,7 +55,7 @@ namespace DataAPIRequests.APIClients
                     PostURL = s.Listing.URL,
                     ServerID = s.Id,
                     CreatedAt = DateTime.Now
-                    
+
                 }).Take<Post>(numberOfPosts).ToList(),
 
                 HomeURL = client.Subreddit(nameOfSubreddit).URL,
@@ -86,12 +87,29 @@ namespace DataAPIRequests.APIClients
         // Loads reddit application credentials from file
         private void LoadCredentials()
         {
-            string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\credentials.txt";
-            var credentials = File.ReadAllLines(FILE_PATH);
 
-            this.RedditAppId = credentials[0];
-            this.RedditAppSecret = credentials[1];
-            this.RedditRefreshToken = credentials[2];
+            string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\RedditCredentials.txt";
+
+            try
+            {
+                var credentials = File.ReadAllLines(FILE_PATH);
+
+                this.RedditAppId = credentials[0];
+                this.RedditAppSecret = credentials[1];
+                this.RedditRefreshToken = credentials[2];
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("The file or directory cannot be found.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("You do not have permission to access this file.");
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
+            }
         }
     }
 }
