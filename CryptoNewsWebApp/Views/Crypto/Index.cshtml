@@ -1,0 +1,22 @@
+﻿@model IEnumerable<CryptoNewsWebApp.Models.Post>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @foreach (Post post in Model)
+                {
+                    <h4><a href=@post.PostURL>@post.PostName</a></h4>
+                    <p>@post.CreatedAt</p>
+                }
+
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+</table>
+
