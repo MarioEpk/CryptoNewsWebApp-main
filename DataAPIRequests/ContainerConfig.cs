@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Reddit;
 
 namespace DataAPIRequests
 {
@@ -27,6 +28,7 @@ namespace DataAPIRequests
 
             builder.RegisterType<BusinessLogic>().As<IBusinessLogic>();
             builder.RegisterType<CardanoRedditClient>().As<IDataAccess>();
+            builder.RegisterType<RedditClient>().AsSelf();
 
 
             //builder.registertype<applicationdbcontext>().asself();

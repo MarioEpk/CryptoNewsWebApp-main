@@ -43,7 +43,7 @@ namespace DataAPIRequests.APIClients
             Console.WriteLine("Fetching Data from Reddit API...");
             DataSource subreddit;
             string nameOfSubreddit = "Cardano";
-            int numberOfPosts = 6;
+            int numberOfPosts = 10;
 
             var cryptoSubRedditPosts = client.Subreddit(nameOfSubreddit).Posts.Hot;
 
@@ -74,9 +74,9 @@ namespace DataAPIRequests.APIClients
         /// <returns></returns>
         public async Task SaveDataToDatabase(DataSource source)
         {
-            var listOfPosts = await _context.Post.ToListAsync();
+            var postsAlreadyInDatabase = _context.Post.AsQueryable<Post>();
             // filter the Posts in the DataSource source object, so only posts with unique ServerID are saved to the database    
-            source.Posts = source.Posts.Where(post => post.ServerID.Equals(source.Posts.Select(post => post.ServerID)));
+            source.Posts = source.Posts.Where(x => !postsAlreadyInDatabase.Any(y => y.ServerID.Equals(x.ServerID))).ToList();
 
             await _context.AddAsync<DataSource>(source);
             await _context.SaveChangesAsync();
@@ -106,7 +106,7 @@ namespace DataAPIRequests.APIClients
             {
                 Console.WriteLine("You do not have permission to access this file.");
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
             }

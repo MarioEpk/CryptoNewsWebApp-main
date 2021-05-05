@@ -62,7 +62,7 @@ namespace DataAPIRequests.APIClients
             {
                 Console.WriteLine("You do not have permission to access this file.");
             }
-            catch (IOException e)
+            catch (IOException)
             {
                 Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
             }

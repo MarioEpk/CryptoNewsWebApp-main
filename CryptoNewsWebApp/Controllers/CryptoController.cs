@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CryptoNewsWebApp.Data;
-using CryptoNewsWebApp.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CryptoNewsWebApp.Controllers
