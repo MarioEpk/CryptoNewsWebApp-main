@@ -92,7 +92,7 @@ namespace DataAPIRequests.APIClients
             await _context.AddAsync<DataSource>(source);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine("Data saved into the database.");
+            Console.WriteLine("Reddit data saved into the database.");
         }
 
         // Loads reddit application credentials from file

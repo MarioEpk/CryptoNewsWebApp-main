@@ -25,8 +25,9 @@ namespace DataAPIRequests
             }).InstancePerLifetimeScope();            
 
             builder.RegisterType<BusinessLogic>().As<IBusinessLogic>();
-            builder.RegisterType<CardanoRedditClient>().As<IDataAccess>();
-            //builder.RegisterType<MarketCapClient>().As<IDataAccess>();
+
+            //builder.RegisterType<CardanoRedditClient>().As<IDataAccess>();
+            builder.RegisterType<MarketCapClient>().As<IDataAccess>();
 
 
             builder.RegisterType<RedditClient>().AsSelf();

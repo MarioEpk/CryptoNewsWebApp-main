@@ -12,7 +12,7 @@ namespace WebApplication.Models
     {
         public int Id { get; set; }
         public string name { get; set; }
-        public int? cmc_rank { get; set; }
+        public int cmc_rank { get; set; }
         public Quote quote { get; set; }
         
     }

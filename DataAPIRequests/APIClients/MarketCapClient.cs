@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Net;
 using System.Web;
+using WebApplication.Models;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace DataAPIRequests.APIClients
 {
@@ -19,6 +22,7 @@ namespace DataAPIRequests.APIClients
         private const string API_ENDPOINT = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest";
 
         private string coinMarketcapApiKey;
+
         ApplicationDbContext _context;
 
         public MarketCapClient(ApplicationDbContext context)
@@ -37,12 +41,16 @@ namespace DataAPIRequests.APIClients
 
         public DataSource LoadData()
         {
-            DataSource cardanoCoin;
+            var response = JsonConvert.DeserializeObject<ClientResponse>(GetCardanoJson(coinMarketcapApiKey));
 
-            
+            DataSource cardanoCoin = new DataSource();
+            cardanoCoin.Coin = new CMCCoin();
+            cardanoCoin.Coin.Name = response.Data.Cardano.name;
+            cardanoCoin.Coin.CMCRank = response.Data.Cardano.cmc_rank;
+            cardanoCoin.Coin.CreatedAt = DateTime.Now;
+            cardanoCoin.Coin.Price = response.Data.Cardano.quote.USD.price;
 
-            throw new NotImplementedException();
-            // Dal som si do bookmarky coinmarketcapAPI examples.
+            return cardanoCoin;
         }
 
         private string GetCardanoJson(string apiKey)
@@ -61,9 +69,12 @@ namespace DataAPIRequests.APIClients
             return client.DownloadString(URL.ToString());
         }
 
-        public Task SaveDataToDatabase(DataSource source)
+        public async Task SaveDataToDatabase(DataSource source)
         {
-            throw new NotImplementedException();
+            await _context.AddAsync<DataSource>(source);
+            await _context.SaveChangesAsync();
+
+            Console.WriteLine("CMC data saved into the database.");
         }
 
         private void LoadCredentials()

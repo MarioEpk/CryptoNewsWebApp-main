@@ -14,5 +14,7 @@ namespace CryptoNewsWebApp.Models
         public DateTime CreatedAt { get; set; }
         public string TypeOfSource { get; set; }
         public CMCCoin Coin { get; set; }
+
+        
     }
 }
