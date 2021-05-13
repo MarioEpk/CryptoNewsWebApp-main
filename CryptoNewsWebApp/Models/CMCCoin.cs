@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication.Models;
 
-namespace CryptoNewsWebApp.Models
+namespace WebApplication.Models
 {
-    public class DataSource
+
+    /// <summary>
+    /// DB model for CoinmarketCap coins
+    /// </summary>
+    public class CMCCoin
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<Post> Posts { get; set; }
+        public float Price { get; set; }
+        public int CMCRank { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string TypeOfSource { get; set; }
-        public CMCCoin Coin { get; set; }
     }
 }

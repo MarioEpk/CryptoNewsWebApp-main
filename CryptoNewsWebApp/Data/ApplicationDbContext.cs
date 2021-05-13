@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CryptoNewsWebApp.Models;
+using WebApplication.Models;
 
 namespace CryptoNewsWebApp.Data
 {
@@ -15,6 +15,7 @@ namespace CryptoNewsWebApp.Data
         }
         public DbSet<CryptoNewsWebApp.Models.DataSource> DataSource { get; set; }
         public DbSet<CryptoNewsWebApp.Models.Post> Post { get; set; }
-        
+        public DbSet<WebApplication.Models.CMCCoin> Coin { get; set; }
+
     }
 }

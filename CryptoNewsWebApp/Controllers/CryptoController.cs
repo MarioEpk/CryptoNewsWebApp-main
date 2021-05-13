@@ -11,7 +11,6 @@ namespace CryptoNewsWebApp.Controllers
 {
     public class CryptoController : Controller
     {
-
         private readonly ApplicationDbContext _context;
 
         public CryptoController(ApplicationDbContext context)

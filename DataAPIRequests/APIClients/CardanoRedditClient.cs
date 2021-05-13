@@ -11,15 +11,17 @@ using CryptoNewsWebApp.Models;
 
 namespace DataAPIRequests.APIClients
 {
-    class CardanoRedditClient : IDataAccess
+    public class CardanoRedditClient : IDataAccess
     {
-        private RedditClient client;
+        RedditClient _client;
         ApplicationDbContext _context;
 
-        public string RedditAppId { get; set; }
-        public string RedditAppSecret { get; set; }
-        public string RedditRefreshToken { get; set; }
+        const string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\RedditCredentials.txt";
 
+        public string redditAppId;
+        public string redditAppSecret;
+        public string redditRefreshToken;
+            
         public CardanoRedditClient(ApplicationDbContext context)
         {
             _context = context;
@@ -27,7 +29,8 @@ namespace DataAPIRequests.APIClients
             {
                 LoadCredentials();
                 // Prerobit RedditClient na autofac
-                client = new RedditClient(appId: RedditAppId, appSecret: RedditAppSecret, refreshToken: RedditRefreshToken);
+                
+                _client = new RedditClient(appId: redditAppId, appSecret: redditAppSecret, refreshToken: redditRefreshToken);
             }
             catch (TimeoutException exception)
             {
@@ -45,7 +48,7 @@ namespace DataAPIRequests.APIClients
             string nameOfSubreddit = "Cardano";
             int numberOfPosts = 10;
 
-            var cryptoSubRedditPosts = client.Subreddit(nameOfSubreddit).Posts.Hot;
+            var cryptoSubRedditPosts = _client.Subreddit(nameOfSubreddit).Posts.Hot;
 
             subreddit = new DataSource
             {
@@ -58,7 +61,6 @@ namespace DataAPIRequests.APIClients
 
                 }).Take<Post>(numberOfPosts).ToList(),
 
-                HomeURL = client.Subreddit(nameOfSubreddit).URL,
                 Name = nameOfSubreddit,
                 CreatedAt = DateTime.Now,
                 TypeOfSource = "Reddit"
@@ -74,9 +76,18 @@ namespace DataAPIRequests.APIClients
         /// <returns></returns>
         public async Task SaveDataToDatabase(DataSource source)
         {
-            var postsAlreadyInDatabase = _context.Post.AsQueryable<Post>();
+            //var postsAlreadyInDatabase = _context.Post.AsQueryable<Post>();
+
+            var existingPostIDs = _context.Post.Select(p => p.ServerID);
+
             // filter the Posts in the DataSource source object, so only posts with unique ServerID are saved to the database    
-            source.Posts = source.Posts.Where(x => !postsAlreadyInDatabase.Any(y => y.ServerID.Equals(x.ServerID))).ToList();
+            //source.Posts = source.Posts
+            //    .Where(x => !postsAlreadyInDatabase.Any(y => y.ServerID.Equals(x.ServerID)))
+            //    .ToList();
+
+            source.Posts = source.Posts
+                .Where(p => !existingPostIDs.Contains(p.ServerID))
+                .ToList();
 
             await _context.AddAsync<DataSource>(source);
             await _context.SaveChangesAsync();
@@ -87,16 +98,13 @@ namespace DataAPIRequests.APIClients
         // Loads reddit application credentials from file
         private void LoadCredentials()
         {
-
-            string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\RedditCredentials.txt";
-
             try
             {
                 var credentials = File.ReadAllLines(FILE_PATH);
 
-                this.RedditAppId = credentials[0];
-                this.RedditAppSecret = credentials[1];
-                this.RedditRefreshToken = credentials[2];
+                this.redditAppId = credentials[0];
+                this.redditAppSecret = credentials[1];
+                this.redditRefreshToken = credentials[2];
             }
             catch (FileNotFoundException)
             {

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace CryptoNewsWebApp.Models
 {
+    /// <summary>
+    /// DB model for Reddit Posts
+    /// </summary>
     public class Post
     {
         public int Id { get; set; }
