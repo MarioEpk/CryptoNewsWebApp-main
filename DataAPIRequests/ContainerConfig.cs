@@ -26,8 +26,8 @@ namespace DataAPIRequests
 
             builder.RegisterType<BusinessLogic>().As<IBusinessLogic>();
 
-            //builder.RegisterType<CardanoRedditClient>().As<IDataAccess>();
-            builder.RegisterType<MarketCapClient>().As<IDataAccess>();
+            builder.RegisterType<CardanoRedditClient>();
+            builder.RegisterType<MarketCapClient>();
 
 
             builder.RegisterType<RedditClient>().AsSelf();

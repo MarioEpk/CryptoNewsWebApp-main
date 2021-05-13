@@ -10,21 +10,26 @@ namespace DataAPIRequests
 {
     public class BusinessLogic : IBusinessLogic
     {
-        IDataAccess _dataAccess;      
+        CardanoRedditClient _redditClient;
+        MarketCapClient _marketCapClient;
 
-        public BusinessLogic(IDataAccess dataAccess)
+        public BusinessLogic(CardanoRedditClient redditClient, MarketCapClient marketCapClient)
         {
-            _dataAccess = dataAccess;      
+            _redditClient = redditClient;
+            _marketCapClient = marketCapClient;
         }
 
         public async Task ProcessData()
         {
-            // fetching data
-            var cardanoSubreddit = _dataAccess.LoadData();
-            // Test save into db
-            await _dataAccess.SaveDataToDatabase(cardanoSubreddit);
+            List<IDataAccess> dataAccesses = new List<IDataAccess>();
+            dataAccesses.Add(_redditClient);
+            dataAccesses.Add(_marketCapClient);
 
-            
+            foreach(IDataAccess dataAccess in dataAccesses)
+            {
+                var data = dataAccess.LoadData();
+                await dataAccess.SaveDataToDatabase(data);
+            }
         }
 
         
