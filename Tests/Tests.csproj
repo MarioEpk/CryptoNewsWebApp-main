@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CryptoNewsWebApp\WebApplication.csproj" />
+    <ProjectReference Include="..\Crypto.Models\Crypto.Models.csproj" />
   </ItemGroup>
 
 </Project>

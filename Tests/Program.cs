@@ -6,7 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Net;
 using Newtonsoft.Json;
-using WebApplication.Models;
+using Crypto.Models;
 using System.Collections.Generic;
 
 namespace Tests
