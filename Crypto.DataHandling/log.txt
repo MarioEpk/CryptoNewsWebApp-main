@@ -6,3 +6,11 @@
 2021-05-17 13:01:02.174 +02:00 [DBG] Fetching data from the CMC API...
 2021-05-17 13:01:02.567 +02:00 [DBG] CMC data saved into the database.
 2021-05-17 13:01:02.572 +02:00 [DBG] Old CMC coins deleted from database
+2021-05-17 16:20:25.981 +02:00 [DBG] Fetching Data from the Reddit API...
+2021-05-17 16:20:28.791 +02:00 [DBG] Data fetched.
+2021-05-17 16:20:29.648 +02:00 [DBG] Reddit data saved into the database.
+2021-05-17 16:20:29.694 +02:00 [DBG] Old datasource entries deleted from database
+2021-05-17 16:20:29.697 +02:00 [DBG] Old Reddit posts deleted from database
+2021-05-17 16:20:29.698 +02:00 [DBG] Fetching data from the CMC API...
+2021-05-17 16:20:30.087 +02:00 [DBG] CMC data saved into the database.
+2021-05-17 16:20:30.094 +02:00 [DBG] Old CMC coins deleted from database

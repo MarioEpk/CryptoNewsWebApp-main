@@ -1,8 +1,10 @@
-﻿@{
+﻿@model CoinViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Here you can find the latest news regarding Cardano, and other cryptocurrencies.</p>
+    <p>Here you can find the latest news regarding Cardano, and other cryptocurrencies. The current Cardano price is @Model.LatestPrice</p>
 </div>

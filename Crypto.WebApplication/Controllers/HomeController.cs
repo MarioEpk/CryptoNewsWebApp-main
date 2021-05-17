@@ -1,23 +1,41 @@
-﻿using Crypto.WebApplication.Models;
+﻿using Crypto.WebApplication.Data;
+using Crypto.WebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Crypto.WebApplication.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> logger;
+        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
-            this.logger = logger;
+            _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            
-            return View();
+            var cardanoName = "Cardano";
+
+            var latestCardanoCoin = _context.Coin
+                .Where(coin => coin.Name.Equals(cardanoName))
+                .OrderByDescending(coin => coin.CreatedAt)
+                .FirstOrDefault();
+
+            CoinViewModel cardano = new CoinViewModel
+            {
+                CMCRank = latestCardanoCoin.CMCRank,
+                LatestPrice = latestCardanoCoin.Price,
+                Name = latestCardanoCoin.Name
+            };
+
+            return View(cardano);
         }
 
         public IActionResult Privacy()

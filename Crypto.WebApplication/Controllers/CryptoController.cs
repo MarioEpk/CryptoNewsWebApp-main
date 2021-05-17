@@ -36,7 +36,10 @@ namespace Crypto.WebApplication.Controllers
         // POST: Crypto/ShowSearchResults
         public async Task<IActionResult> ShowSearchResults(String SearchPhrase)
         {
-            return View("index", await _context.Post.Where(j => j.PostName.Contains(SearchPhrase)).ToListAsync());
+            return View("index", await _context.Post
+                .Where(j => j.PostName
+                .Contains(SearchPhrase))
+                .ToListAsync());
         }
     }
 }
