@@ -43,7 +43,7 @@ namespace Crypto.DataHandling.APIClients
 
         public DataSource LoadData()
         {
-            Console.WriteLine("Fetching data from the CMC API...");
+            _logger.Debug("Fetching data from the CMC API...");
             var response = JsonConvert.DeserializeObject<ClientResponse>(GetCardanoJson(coinMarketcapApiKey));
 
             CMCCoin coin = new CMCCoin
@@ -87,7 +87,7 @@ namespace Crypto.DataHandling.APIClients
             await _context.AddAsync(source);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine("CMC data saved into the database.");
+            _logger.Debug("CMC data saved into the database.");
         }
 
         private void LoadCredentials()
@@ -99,15 +99,15 @@ namespace Crypto.DataHandling.APIClients
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine("The file or directory cannot be found.");
+                _logger.Error("The file or directory cannot be found.");
             }
             catch (UnauthorizedAccessException)
             {
-                Console.WriteLine("You do not have permission to access this file.");
+                _logger.Error("You do not have permission to access this file.");
             }
             catch (IOException)
             {
-                Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
+                _logger.Error("An unexpected error occured while loading the Reddit app credentials");
             }
         }
 
@@ -120,7 +120,7 @@ namespace Crypto.DataHandling.APIClients
             });
 
             await _context.SaveChangesAsync();
-            Console.WriteLine("Old CMC coins deleted from database");
+            _logger.Debug("Old CMC coins deleted from database");
         }
     }
 }

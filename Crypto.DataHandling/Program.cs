@@ -23,7 +23,8 @@ namespace Crypto.DataHandling
         }
         private static async Task MainAsync()
         {
-            
+            Log.Debug("-------------");
+            Log.Debug("Crypto.DataHandling started");
             // Autofac DI
             var container = ContainerConfig.Configure();
 

@@ -47,7 +47,7 @@ namespace Crypto.DataHandling.APIClients
         /// <returns>DataSource object</returns>
         public DataSource LoadData()
         {
-            _logger.Information("Fetching Data from the Reddit API...");
+            _logger.Debug("Fetching Data from the Reddit API...");
 
             DataSource subreddit;
             string nameOfSubreddit = "Cardano";
@@ -71,7 +71,7 @@ namespace Crypto.DataHandling.APIClients
                 TypeOfSource = "Reddit"
             };
 
-            Console.WriteLine("Data fetched.");
+            _logger.Debug("Data fetched.");
             return subreddit;
         }
         /// <summary>
@@ -97,7 +97,7 @@ namespace Crypto.DataHandling.APIClients
             await _context.AddAsync(source);
             await _context.SaveChangesAsync();
 
-            Console.WriteLine("Reddit data saved into the database.");
+            _logger.Debug("Reddit data saved into the database.");
         }
 
         // Loads reddit application credentials from file
@@ -137,7 +137,7 @@ namespace Crypto.DataHandling.APIClients
                 _context.Remove(datasource);
             });
 
-            Console.WriteLine("Old datasource entries  deleted from database");
+            _logger.Debug("Old datasource entries deleted from database");
 
             await oldRedditPosts.ForEachAsync(post =>
              {
@@ -145,7 +145,7 @@ namespace Crypto.DataHandling.APIClients
              });
 
             await _context.SaveChangesAsync();
-            Console.WriteLine("Old Reddit posts deleted from database");
+            _logger.Debug("Old Reddit posts deleted from database");
         }
     }
 }
