@@ -1,17 +1,17 @@
-﻿using Crypto.WebApplication.Data;
+﻿using Crypto.DataHandling.APIClients;
+using Crypto.WebApplication.Data;
 using Crypto.WebApplication.Models;
-using DataHandling.APIClients;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataHandling
+namespace Crypto.DataHandling
 {
     public class BusinessLogic : IBusinessLogic
     {
-        CardanoRedditClient _redditClient;
-        MarketCapClient _marketCapClient;
+        private readonly CardanoRedditClient _redditClient;
+        private readonly MarketCapClient _marketCapClient;
 
         public BusinessLogic(CardanoRedditClient redditClient, MarketCapClient marketCapClient)
         {
@@ -37,9 +37,10 @@ namespace DataHandling
             {
                 var data = dataAccess.LoadData();
                 await dataAccess.SaveDataToDatabase(data);
+                await dataAccess.ClearOldEntries();
             }
         }
 
-        
+
     }
 }

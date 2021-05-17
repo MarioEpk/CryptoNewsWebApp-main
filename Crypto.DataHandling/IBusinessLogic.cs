@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DataHandling
+namespace Crypto.DataHandling
 {
     public interface IBusinessLogic
     {

@@ -43,9 +43,9 @@ namespace Tests
             //cardanoJson = cardanoJson["2010"];
 
 
-            Console.WriteLine(response.Data.Cardano.name);
-            Console.WriteLine(response.Data.Cardano.cmc_rank);
-            Console.WriteLine(response.Data.Cardano.quote.USD.price);
+            Console.WriteLine(response.Data.Cardano.Name);
+            Console.WriteLine(response.Data.Cardano.Cmc_rank);
+            Console.WriteLine(response.Data.Cardano.Quote.USD.Price);
             Console.WriteLine("done");
         }
         static string GetCardanoJson(string apiKey)

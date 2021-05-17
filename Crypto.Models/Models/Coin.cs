@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,9 +12,12 @@ namespace Crypto.Models
     public class Coin
     {
         public int Id { get; set; }
-        public string name { get; set; }
-        public int cmc_rank { get; set; }
-        public Quote quote { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("cmc_rank")]
+        public int Cmc_rank { get; set; }
+        [JsonProperty("quote")]
+        public Quote Quote { get; set; }
         
     }
 }

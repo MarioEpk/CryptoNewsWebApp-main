@@ -16,6 +16,7 @@ namespace Crypto.WebApplication.Controllers
 
         public IActionResult Index()
         {
+            
             return View();
         }
 

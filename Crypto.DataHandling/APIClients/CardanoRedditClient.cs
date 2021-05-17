@@ -8,29 +8,33 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Crypto.WebApplication.Data;
 using Crypto.WebApplication.Models;
+using Serilog;
 
-namespace DataHandling.APIClients
+namespace Crypto.DataHandling.APIClients
 {
     public class CardanoRedditClient : IDataAccess
     {
-        RedditClient _client;
-        ApplicationDbContext _context;
+        // DI
+        private readonly RedditClient _client;
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        const string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\RedditCredentials.txt";
+        const string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\Crypto.DataHandling\RedditCredentials.txt";
 
         public string redditAppId;
         public string redditAppSecret;
         public string redditRefreshToken;
-            
-        public CardanoRedditClient(ApplicationDbContext context)
+
+        public CardanoRedditClient(ApplicationDbContext context, ILogger logger)
         {
+            _logger = logger;
             _context = context;
             try
             {
                 LoadCredentials();
                 // Prerobit RedditClient na autofac
-                
                 _client = new RedditClient(appId: redditAppId, appSecret: redditAppSecret, refreshToken: redditRefreshToken);
+
             }
             catch (TimeoutException exception)
             {
@@ -43,7 +47,8 @@ namespace DataHandling.APIClients
         /// <returns>DataSource object</returns>
         public DataSource LoadData()
         {
-            Console.WriteLine("Fetching Data from the Reddit API...");
+            _logger.Information("Fetching Data from the Reddit API...");
+
             DataSource subreddit;
             string nameOfSubreddit = "Cardano";
             int numberOfPosts = 10;
@@ -59,9 +64,9 @@ namespace DataHandling.APIClients
                     ServerID = s.Id,
                     CreatedAt = DateTime.Now
 
-                }).Take<Post>(numberOfPosts).ToList(),
+                }).Take(numberOfPosts).ToList(),
 
-                Name = nameOfSubreddit,
+                Name = "CardanoReddit",
                 CreatedAt = DateTime.Now,
                 TypeOfSource = "Reddit"
             };
@@ -89,7 +94,7 @@ namespace DataHandling.APIClients
                 .Where(p => !existingPostIDs.Contains(p.ServerID))
                 .ToList();
 
-            await _context.AddAsync<DataSource>(source);
+            await _context.AddAsync(source);
             await _context.SaveChangesAsync();
 
             Console.WriteLine("Reddit data saved into the database.");
@@ -102,22 +107,45 @@ namespace DataHandling.APIClients
             {
                 var credentials = File.ReadAllLines(FILE_PATH);
 
-                this.redditAppId = credentials[0];
-                this.redditAppSecret = credentials[1];
-                this.redditRefreshToken = credentials[2];
+                redditAppId = credentials[0];
+                redditAppSecret = credentials[1];
+                redditRefreshToken = credentials[2];
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException e)
             {
-                Console.WriteLine("The file or directory cannot be found.");
+                Console.WriteLine(e.Message);
+
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException e)
             {
-                Console.WriteLine("You do not have permission to access this file.");
+                Console.WriteLine(e.Message);
             }
-            catch (IOException)
+            catch (IOException e)
             {
-                Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
+                Console.WriteLine(e.Message);
             }
+        }
+
+        public async Task ClearOldEntries()
+        {
+            var oldRedditPosts = _context.Post.Where(post => post.CreatedAt < DateTime.Now.AddMonths(-1));
+
+            var oldDataSourceEntry = _context.Post.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
+
+            await oldDataSourceEntry.ForEachAsync(datasource =>
+            {
+                _context.Remove(datasource);
+            });
+
+            Console.WriteLine("Old datasource entries  deleted from database");
+
+            await oldRedditPosts.ForEachAsync(post =>
+             {
+                 _context.Remove(post);
+             });
+
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Old Reddit posts deleted from database");
         }
     }
 }

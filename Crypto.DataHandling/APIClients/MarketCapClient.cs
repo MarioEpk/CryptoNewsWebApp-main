@@ -12,21 +12,24 @@ using System.Web;
 using Crypto.Models;
 using Newtonsoft.Json;
 using System.Linq;
+using Serilog;
 
-namespace DataHandling.APIClients
+namespace Crypto.DataHandling.APIClients
 {
     public class MarketCapClient : IDataAccess
     {
-        private const string CREDENTIALS_FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\DataAPIRequests\CoinMarketCapCredentials.txt";
+        private const string CREDENTIALS_FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\Crypto.DataHandling\CoinMarketCapCredentials.txt";
         private const string API_ENDPOINT = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest";
-
         private string coinMarketcapApiKey;
 
-        ApplicationDbContext _context;
+        // DI
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger _logger;
 
-        public MarketCapClient(ApplicationDbContext context)
+        public MarketCapClient(ApplicationDbContext context, ILogger logger)
         {
             _context = context;
+            _logger = logger;
 
             try
             {
@@ -45,15 +48,18 @@ namespace DataHandling.APIClients
 
             CMCCoin coin = new CMCCoin
             {
-                Name = response.Data.Cardano.name,
-                CMCRank = response.Data.Cardano.cmc_rank,
+                Name = response.Data.Cardano.Name,
+                CMCRank = response.Data.Cardano.Cmc_rank,
                 CreatedAt = DateTime.Now,
-                Price = response.Data.Cardano.quote.USD.price
+                Price = response.Data.Cardano.Quote.USD.Price
             };
 
             DataSource cardanoCoin = new DataSource
             {
-                Coin = coin
+                Coin = coin,
+                TypeOfSource = "CMC",
+                CreatedAt = DateTime.Now,
+                Name = "CardanoCMC"
             };
 
             return cardanoCoin;
@@ -78,7 +84,7 @@ namespace DataHandling.APIClients
 
         public async Task SaveDataToDatabase(DataSource source)
         {
-            await _context.AddAsync<DataSource>(source);
+            await _context.AddAsync(source);
             await _context.SaveChangesAsync();
 
             Console.WriteLine("CMC data saved into the database.");
@@ -89,7 +95,7 @@ namespace DataHandling.APIClients
             try
             {
                 var credentials = File.ReadAllLines(CREDENTIALS_FILE_PATH);
-                this.coinMarketcapApiKey = credentials[0];
+                coinMarketcapApiKey = credentials[0];
             }
             catch (FileNotFoundException)
             {
@@ -104,7 +110,18 @@ namespace DataHandling.APIClients
                 Console.WriteLine("An unexpected error occured while loading the Reddit app credentials");
             }
         }
-    }
 
+        public async Task ClearOldEntries()
+        {
+            var oldCMCCoins = _context.Coin.Where(coin => coin.CreatedAt < DateTime.Now.AddMonths(-1));
+            await oldCMCCoins.ForEachAsync(coin =>
+            {
+                _context.Remove(coin);
+            });
+
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Old CMC coins deleted from database");
+        }
+    }
 }
 

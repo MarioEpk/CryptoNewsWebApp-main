@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataHandling.APIClients
+namespace Crypto.DataHandling.APIClients
 {
     public interface IDataAccess
     {
         DataSource LoadData();
         Task SaveDataToDatabase(DataSource source);
+        Task ClearOldEntries();
 
     }
 }
