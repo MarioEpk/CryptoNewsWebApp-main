@@ -13,6 +13,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\assets\img\about-bg.jpg" />
+    <Content Remove="wwwroot\assets\img\contact-bg.jpg" />
+    <Content Remove="wwwroot\assets\img\home-bg.jpg" />
+    <Content Remove="wwwroot\assets\img\post-bg.jpg" />
+    <Content Remove="wwwroot\assets\img\post-sample-image.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\favicon.ico" />
+    <None Include="wwwroot\assets\img\medusa-header.png" />
+    <None Include="wwwroot\assets\mail\contact_me.js" />
+    <None Include="wwwroot\assets\mail\contact_me.php" />
+    <None Include="wwwroot\assets\mail\jqBootstrapValidation.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.11" />
