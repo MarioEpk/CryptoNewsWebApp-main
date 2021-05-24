@@ -32,9 +32,19 @@ namespace Crypto.WebApplication
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddControllersWithViews();
+            //services.AddRazorPages();
+
+#if DEBUG
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
+            services.AddRazorPages()
+                .AddRazorRuntimeCompilation();
+#else
             services.AddControllersWithViews();
             services.AddRazorPages();
-             
+#endif
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
