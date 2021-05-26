@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Crypto.WebApplication.Models.PostViewModel>
+
+<div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+        <h1 class="post-heading">
+            Search Results:
+        </h1>
+        <br />
+        <br />
+        @foreach (PostViewModel post in Model)
+        {
+            <div class="post-preview">
+                <h2 class="post-title"><a href=@post.URL>@post.Title</a></h2>
+                <p class="post-meta">
+                    Posted on @post.PostedAt
+                </p>
+            </div>
+            <hr />
+        }
+    </div>
+</div>

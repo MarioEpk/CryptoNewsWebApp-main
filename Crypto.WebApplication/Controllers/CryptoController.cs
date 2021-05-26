@@ -12,6 +12,7 @@ namespace Crypto.WebApplication.Controllers
     public class CryptoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        List<PostViewModel> posts = new List<PostViewModel>();
 
         public CryptoController(ApplicationDbContext context)
         {
@@ -28,11 +29,9 @@ namespace Crypto.WebApplication.Controllers
                 .Take(numberOfPosts)
                 .ToListAsync();
 
-            List<PostViewModel> topPosts = new List<PostViewModel>();
-            
             foreach(var post in dbTopPosts)
             {
-                topPosts.Add(new PostViewModel
+                posts.Add(new PostViewModel
                 {
                     Title = post.PostName,
                     PostedAt = post.PostedAt,
@@ -40,7 +39,7 @@ namespace Crypto.WebApplication.Controllers
                 });
             }
 
-            return View(topPosts);
+            return View(posts);
         }
         // GET: Search
         public async Task<IActionResult> ShowSearchForm()
@@ -51,10 +50,22 @@ namespace Crypto.WebApplication.Controllers
         // POST: Crypto/ShowSearchResults
         public async Task<IActionResult> ShowSearchResults(String SearchPhrase)
         {
-            return View("index", await _context.Post
+            var searchedPosts = await _context.Post
                 .Where(j => j.PostName
                 .Contains(SearchPhrase))
-                .ToListAsync());
+                .ToListAsync();
+
+            foreach (var post in searchedPosts)
+            {
+                posts.Add(new PostViewModel
+                {
+                    Title = post.PostName,
+                    PostedAt = post.PostedAt,
+                    URL = post.PostURL
+                });
+            }
+
+            return View(posts);
         }
     }
 }
