@@ -1,6 +1,4 @@
-﻿using Crypto.WebApplication.Data;
-using Crypto.WebApplication.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -13,6 +11,7 @@ using Crypto.Models;
 using Newtonsoft.Json;
 using System.Linq;
 using Serilog;
+using Crypto.Models.Data;
 
 namespace Crypto.DataHandling.APIClients
 {

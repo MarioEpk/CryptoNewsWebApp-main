@@ -6,9 +6,9 @@ using Reddit;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Crypto.WebApplication.Data;
-using Crypto.WebApplication.Models;
 using Serilog;
+using Crypto.Models.Data;
+using Crypto.Models;
 
 namespace Crypto.DataHandling.APIClients
 {
@@ -62,8 +62,10 @@ namespace Crypto.DataHandling.APIClients
                     PostName = s.Title,
                     PostURL = s.Listing.URL,
                     ServerID = s.Id,
-                    CreatedAt = DateTime.Now
-
+                    // CreatedAt points to the date the post was saved into DB
+                    CreatedAt = DateTime.Now,
+                    // PostedAt points to the date the original reddit post was created
+                    PostedAt = s.Created
                 }).Take(numberOfPosts).ToList(),
 
                 Name = "CardanoReddit",
@@ -147,5 +149,6 @@ namespace Crypto.DataHandling.APIClients
             await _context.SaveChangesAsync();
             _logger.Debug("Old Reddit posts deleted from database");
         }
+
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Crypto.WebApplication.Data.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(Models.Data.ApplicationDbContext))]
     [Migration("20210503091752_ChangedModelsAgain")]
     partial class ChangedModelsAgain
     {

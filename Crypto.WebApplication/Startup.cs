@@ -1,3 +1,4 @@
+using Crypto.Models.Data;
 using Crypto.WebApplication.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

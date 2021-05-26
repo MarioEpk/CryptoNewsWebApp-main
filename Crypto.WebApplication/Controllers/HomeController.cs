@@ -1,4 +1,4 @@
-﻿using Crypto.WebApplication.Data;
+﻿using Crypto.Models.Data;
 using Crypto.WebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

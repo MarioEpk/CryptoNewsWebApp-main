@@ -1,23 +1,26 @@
-﻿@model IEnumerable<Crypto.WebApplication.Models.Post>
+﻿@model IEnumerable<Crypto.WebApplication.Models.PostViewModel>
 
         <div class="row">
             <div class="col-lg-8 col-md-10 mx-auto">
-                @foreach (Post post in Model)
+                <h1 class="post-title">
+                    Latest hot reddit posts:
+                </h1>
+                <br />
+                <br />
+                @foreach (PostViewModel post in Model)
                 {
                     <div class="post-preview">
-                        <h2 class="post-title"><a href=@post.PostURL>@post.PostName</a></h2>
-                        <h3 class="post-subtitle">@post.CreatedAt</h3>
+                        <h2 class="post-title"><a href=@post.URL>@post.Title</a></h2>
+                       
 
                         <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on September 24, 2021
+                            Posted on @post.PostedAt
                         </p>
                     </div>
                     <hr />
                 }
                 <!-- Pager-->
-                <div class="clearfix"><a class="btn btn-primary float-right" href="#!">Older Posts →</a></div>
+                @*<div class="clearfix"><a class="btn btn-primary float-right" href="#!">Older Posts →</a></div>*@
             </div>
         </div>
 

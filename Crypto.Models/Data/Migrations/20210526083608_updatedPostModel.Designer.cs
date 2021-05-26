@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Crypto.WebApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210504120005_deletedUnusedmodels")]
-    partial class deletedUnusedmodels
+    [Migration("20210526083608_updatedPostModel")]
+    partial class updatedPostModel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,18 +22,42 @@ namespace Crypto.WebApplication.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("CryptoNewsWebApp.Models.DataSource", b =>
+            modelBuilder.Entity("Crypto.Models.CMCCoin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("CMCRank")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HomeURL")
+                    b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Coin");
+                });
+
+            modelBuilder.Entity("Crypto.WebApplication.Models.DataSource", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("CoinId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -43,10 +67,12 @@ namespace Crypto.WebApplication.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CoinId");
+
                     b.ToTable("DataSource");
                 });
 
-            modelBuilder.Entity("CryptoNewsWebApp.Models.Post", b =>
+            modelBuilder.Entity("Crypto.WebApplication.Models.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -64,6 +90,9 @@ namespace Crypto.WebApplication.Data.Migrations
 
                     b.Property<string>("PostURL")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PostedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ServerID")
                         .HasColumnType("nvarchar(max)");
@@ -275,9 +304,16 @@ namespace Crypto.WebApplication.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("CryptoNewsWebApp.Models.Post", b =>
+            modelBuilder.Entity("Crypto.WebApplication.Models.DataSource", b =>
                 {
-                    b.HasOne("CryptoNewsWebApp.Models.DataSource", null)
+                    b.HasOne("Crypto.Models.CMCCoin", "Coin")
+                        .WithMany()
+                        .HasForeignKey("CoinId");
+                });
+
+            modelBuilder.Entity("Crypto.WebApplication.Models.Post", b =>
+                {
+                    b.HasOne("Crypto.WebApplication.Models.DataSource", null)
                         .WithMany("Posts")
                         .HasForeignKey("DataSourceId");
                 });

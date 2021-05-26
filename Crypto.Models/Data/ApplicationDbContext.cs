@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Crypto.Models;
 
-namespace Crypto.WebApplication.Data
+namespace Crypto.Models.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
@@ -13,9 +9,9 @@ namespace Crypto.WebApplication.Data
             : base(options)
         {
         }
-        public DbSet<Crypto.WebApplication.Models.DataSource> DataSource { get; set; }
-        public DbSet<Crypto.WebApplication.Models.Post> Post { get; set; }
-        public DbSet<Crypto.Models.CMCCoin> Coin { get; set; }
+        public DbSet<DataSource> DataSource { get; set; }
+        public DbSet<Post> Post { get; set; }
+        public DbSet<CMCCoin> Coin { get; set; }
 
     }
 }

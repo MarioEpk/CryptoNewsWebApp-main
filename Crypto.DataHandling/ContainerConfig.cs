@@ -8,6 +8,7 @@ using Reddit;
 using AutofacSerilogIntegration;
 using Crypto.DataHandling.APIClients;
 using Serilog;
+using Crypto.Models.Data;
 
 namespace Crypto.DataHandling
 {

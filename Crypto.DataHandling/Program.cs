@@ -1,5 +1,4 @@
 ﻿using Crypto.WebApplication.Data;
-using Crypto.WebApplication.Models;
 using Crypto.DataHandling.APIClients;
 using System;
 using System.IO;

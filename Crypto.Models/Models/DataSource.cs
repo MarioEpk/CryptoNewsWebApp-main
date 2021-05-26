@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Crypto.Models;
 
-namespace Crypto.WebApplication.Models
+namespace Crypto.Models
 {
     public class DataSource
     {

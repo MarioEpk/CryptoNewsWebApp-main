@@ -1,6 +1,5 @@
 ﻿using Crypto.DataHandling.APIClients;
 using Crypto.WebApplication.Data;
-using Crypto.WebApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

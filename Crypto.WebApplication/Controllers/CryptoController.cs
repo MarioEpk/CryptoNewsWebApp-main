@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Crypto.WebApplication.Data;
+using Crypto.Models.Data;
+using Crypto.WebApplication.Models;
 
 namespace Crypto.WebApplication.Controllers
 {
@@ -20,12 +21,26 @@ namespace Crypto.WebApplication.Controllers
         // GET: Crypto
         public async Task<IActionResult> Index()
         {
-            // tu budem vyberat data z contextu DB a zobrazovat ich,index bude home, a spravim si este action na Reddit, na Coinmarket cap
-            var numberOfPosts = 6;
-            return View(await _context.Post
+            var numberOfPosts = 10;
+
+            var dbTopPosts = await _context.Post
                 .OrderByDescending(post => post.CreatedAt)
                 .Take(numberOfPosts)
-                .ToListAsync());
+                .ToListAsync();
+
+            List<PostViewModel> topPosts = new List<PostViewModel>();
+            
+            foreach(var post in dbTopPosts)
+            {
+                topPosts.Add(new PostViewModel
+                {
+                    Title = post.PostName,
+                    PostedAt = post.PostedAt,
+                    URL = post.PostURL
+                });
+            }
+
+            return View(topPosts);
         }
         // GET: Search
         public async Task<IActionResult> ShowSearchForm()

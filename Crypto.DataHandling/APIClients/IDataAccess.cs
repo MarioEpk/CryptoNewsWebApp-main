@@ -1,4 +1,4 @@
-﻿using Crypto.WebApplication.Models;
+﻿using Crypto.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
