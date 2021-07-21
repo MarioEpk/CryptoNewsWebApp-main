@@ -3,35 +3,184 @@
 @{ ViewData["Title"] = "Home Page"; }
 
 
-    <!-- Main Content-->
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <div class="post-preview">
-                    <h2 class="post-title">
-                        Here you can find the latest news regarding Cardano, all in one place.
-                    </h2>
-                    <br />
-                    <h4 class="post-subtitle">
-                        Price
-                    </h4>
-                    <p>The current Cardano price is <a href="https://coinmarketcap.com/currencies/cardano/"><b>@Model.LatestPrice.ToString("n2")$.</b></a></p>
-                    <br />
-                    <h4 class="post-subtitle">
-                        Links
-                    </h4>
-                    <p><a href="https://roadmap.cardano.org/en/status-updates/">Cardano roadmap</a></p>
-                    <h4 class="post-heading">
-                        Twitter
-                    </h4>
-                    <p><a href="https://twitter.com/cardano?lang=en/">Cardano twitter</a></p>
-                    <p><a href="https://twitter.com/iohk_charles?lang=en/">Charles Hoskinson twitter</a></p>
-                </div>
+<!-- Main Content-->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="post-preview">
+                <h2 class="post-title">
+                    Here you can find the latest news regarding Cardano, all in one place.
+                </h2>
+                <br />
+                <h4 class="post-subtitle">
+                    Price
+                </h4>
+                <p>The current Cardano price is <a href="https://coinmarketcap.com/currencies/cardano/"><b>@Model.LatestPrice.ToString("n2")$.</b></a></p>
+                <br />
+                <h4 class="post-subtitle">
+                    Links
+                </h4>
+                <p><a href="https://roadmap.cardano.org/en/status-updates/">Cardano roadmap</a></p>
+                <h4 class="post-heading">
+                    Twitter
+                </h4>
+                <p><a href="https://twitter.com/cardano?lang=en/">Cardano twitter</a></p>
+                <p><a href="https://twitter.com/iohk_charles?lang=en/">Charles Hoskinson twitter</a></p>
             </div>
         </div>
     </div>
-   
+</div>
 
-  
+<head>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<!-- Plotly chart will be drawn inside this DIV -->
+<div class="graphContainer">
+    <div class="header">
+        <h3>Cardano price graph</h3>
+    </div>
+    <div id="myDiv"></div>
+</div>
+<script>
+    /* JAVASCRIPT CODE GOES HERE */
+    (function() {
+var d3 = Plotly.d3;
+
+var WIDTH_IN_PERCENT_OF_PARENT = 60,
+    HEIGHT_IN_PERCENT_OF_PARENT = 80;
+
+var gd3 = d3.select('body')
+    .append('div')
+    .style({
+        width: WIDTH_IN_PERCENT_OF_PARENT + '%',
+        'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
+
+        height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
+        'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
+    });
+
+var gd = gd3.node();
+
+var volData = {
+	x: [
+			"2017-02-13","2017-02-20","2017-02-27","2017-03-06","2017-03-13","2017-03-20","2017-03-27","2017-04-03","2017-04-10","2017-04-17","2017-04-24","2017-05-01","2017-05-08","2017-05-15","2017-05-22","2017-05-29","2017-06-05","2017-06-12","2017-06-19","2017-06-26","2017-07-03","2017-07-10","2017-07-17","2017-07-24","2017-07-31","2017-08-07","2017-08-14","2017-08-21","2017-08-28","2017-09-04","2017-09-11","2017-09-18","2017-09-25","2017-10-02","2017-10-09","2017-10-16","2017-10-23","2017-10-30","2017-11-06","2017-11-13","2017-11-20","2017-11-27","2017-12-04","2017-12-11","2017-12-18","2017-12-25","2018-01-01","2018-01-08","2018-01-15","2018-01-22","2018-01-29","2018-02-05"
+		 ],
+	y: [		 "106671000","119269000","128804000","123336000","104382000","98192000","111674000","121474000","120084000","128093000","137799000","161455000","185449000","215768000","231089000","255088000","295391000","255042000","258789000","251845000","251917000","191877000","274511000","275562000","321364000","409446000","408264000","433738000","463639000","424036000","366756000","366854000","437271000","458710000","569975000","603433000","613552000","742447000","590965000","802205000","935575000","1137301000","1538854000","1939168000","1427974000","1463718000","1736999000","1440996000","1184023000","1179981000","817271000","828858000"
+		 ],
+	type: 'bar',
+	name: '',
+	marker: {
+		color: '#00DE8D',
+	},
+	showlegend: false,
+};
+var priceData = {
+	x: [
+			"2017-02-13","2017-02-20","2017-02-27"
+		 ],
+	y: [
+			 "1066.71476","1192.69017","1288.04382"
+		 ],
+	yaxis: 'y2',
+	type: 'scatter',
+	name: '',
+	//mode: 'lines+markers',
+	line: {
+		color: '#00DE8D'
+	},
+	fill: 'tozeroy',
+	fillcolor: 'rgba(0,222,141,0.1)', // this just needs to be the line color 10% opacity
+	showlegend: false,
+};
+var data = [volData, priceData];
+
+var layout = {
+	height: 420,
+	spikedistance: 420, // should match height
+	margin: {
+		t: 30,
+		b: 42,
+		l: 54,
+		r: 30
+	},
+	font: {
+		family: 'Roboto Mono, Droid Sans Mono, monospace',
+		size: 12,
+		color: '#93979E'
+	},
+	hoverlabel: {
+		bgcolor: 'rgba(24,25,26,0.8)',
+		bordercolor: 'transparent',
+		font: {
+			family: 'roboto mono',
+			size: 12,
+			color: '#fff'
+		}
+	},
+	xaxis: {
+		showline: true,
+		linecolor: '#E6E8EC',
+		type: 'date',
+		showgrid: false,
+		ticks: 'outside',
+		tickcolor: '#E6E8EC',
+		ticklen: 9,
+		showspikes: true,
+		spikecolor: '#93979E',
+		spikethickness: 1,
+		spikedash: '3px,3px',
+		spikemode: 'across',
+		spikesnap: 'cursor',
+	},
+	yaxis: { // Volume Chart
+		domain: [0, 0.15],
+		fixedrange: true,
+		zeroline: true,
+		zerolinecolor: '#E6E8EC',
+		nticks: 3,
+	},
+	yaxis2: { // Price Chart
+		domain: [0.225, 1],
+		fixedrange: true,
+		showline: false,
+		zeroline: true,
+		zerolinecolor: '#E6E8EC',
+		showspikes: false,
+		spikecolor: '#93979E',
+		spikethickness: 1,
+		spikedash: '3px,3px',
+		spikemode: 'across',
+		tickprefix: '$',
+	},
+	images: [
+    {
+      x: .975,
+      y: .375,
+      sizex: 0.15,
+      sizey: 0.15,
+      source: "https://i.imgur.com/yZVKKnY.png",
+      xanchor: "right",
+      xref: "paper",
+      yanchor: "top",
+      yref: "paper",
+		opacity: .175,
+    }
+  ],
+};
+
+var hideOptions = {displayModeBar: false};
+
+Plotly.newPlot('myDiv', data, layout, hideOptions);
+
+window.onresize = function() {
+    Plotly.Plots.resize('myDiv', gd, data, layout, hideOptions);
+};
+
+})();
+</script>
+
+
 
 

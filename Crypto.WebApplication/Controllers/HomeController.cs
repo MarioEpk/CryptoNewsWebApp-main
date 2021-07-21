@@ -35,6 +35,13 @@ namespace Crypto.WebApplication.Controllers
                 Name = latestCardanoCoin.Name
             };
 
+            List<CoinViewModel> cardanoData = new List<CoinViewModel>();
+
+            cardanoData.Add(new CoinViewModel
+            {
+                
+            });
+
             return View(cardano);
         }
 
