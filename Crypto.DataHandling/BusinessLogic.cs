@@ -1,31 +1,24 @@
 ﻿using Crypto.DataHandling.APIClients;
-using Crypto.WebApplication.Data;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Crypto.DataHandling
 {
     public class BusinessLogic : IBusinessLogic
     {
-        private readonly CardanoRedditClient _redditClient;
-        private readonly MarketCapClient _marketCapClient;
+        private readonly List<IDataAccess> dataAccesses;
 
         public BusinessLogic(CardanoRedditClient redditClient, MarketCapClient marketCapClient)
         {
-            _redditClient = redditClient;
-            _marketCapClient = marketCapClient;
+            dataAccesses = new List<IDataAccess>
+            {
+                redditClient,
+                marketCapClient
+            };
         }
 
         public async Task ProcessData()
         {
-            List<IDataAccess> dataAccesses = new List<IDataAccess>
-            {
-                _redditClient,
-                _marketCapClient
-            };
-
             //dataAccesses.ForEach(async dataAccess =>
             //{
             //    var data = dataAccess.LoadData();
@@ -39,7 +32,5 @@ namespace Crypto.DataHandling
                 await dataAccess.ClearOldEntries();
             }
         }
-
-
     }
 }

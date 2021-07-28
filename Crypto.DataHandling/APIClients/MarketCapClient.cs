@@ -112,6 +112,16 @@ namespace Crypto.DataHandling.APIClients
 
         public async Task ClearOldEntries()
         {
+            var oldDataSourceEntry = _context.DataSource.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
+
+            await oldDataSourceEntry.ForEachAsync(datasource =>
+            {
+                _context.Remove(datasource);
+            });
+
+            _logger.Debug("Old datasource entries deleted from database");
+
+
             var oldCMCCoins = _context.Coin.Where(coin => coin.CreatedAt < DateTime.Now.AddMonths(-1));
             await oldCMCCoins.ForEachAsync(coin =>
             {

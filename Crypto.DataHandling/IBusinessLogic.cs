@@ -4,6 +4,6 @@ namespace Crypto.DataHandling
 {
     public interface IBusinessLogic
     {
-        Task ProcessData();
+        public Task ProcessData();
     }
 }

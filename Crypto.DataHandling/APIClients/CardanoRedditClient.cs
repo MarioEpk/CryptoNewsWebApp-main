@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Reddit;
 using System.IO;
 using System.Threading.Tasks;
@@ -132,7 +130,7 @@ namespace Crypto.DataHandling.APIClients
         {
             var oldRedditPosts = _context.Post.Where(post => post.CreatedAt < DateTime.Now.AddMonths(-1));
 
-            var oldDataSourceEntry = _context.Post.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
+            var oldDataSourceEntry = _context.DataSource.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
 
             await oldDataSourceEntry.ForEachAsync(datasource =>
             {

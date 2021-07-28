@@ -2,7 +2,6 @@
 using Crypto.WebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -21,10 +20,8 @@ namespace Crypto.WebApplication.Controllers
 
         public IActionResult Index()
         {
-            var cardanoName = "Cardano";
-
             var latestCardanoCoin = _context.Coin
-                .Where(coin => coin.Name.Equals(cardanoName))
+                .Where(coin => coin.Name.Equals(CryptoConstants.CARDANO_NAME))
                 .OrderByDescending(coin => coin.CreatedAt)
                 .FirstOrDefault();
 
@@ -35,19 +32,7 @@ namespace Crypto.WebApplication.Controllers
                 Name = latestCardanoCoin.Name
             };
 
-            List<CoinViewModel> cardanoData = new List<CoinViewModel>();
-
-            cardanoData.Add(new CoinViewModel
-            {
-                
-            });
-
             return View(cardano);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

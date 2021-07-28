@@ -12,58 +12,48 @@ namespace Crypto.WebApplication.Controllers
     public class CryptoController : Controller
     {
         private readonly ApplicationDbContext _context;
-        List<PostViewModel> posts = new List<PostViewModel>();
+        private const int NUMBER_OF_POSTS = 10;
 
         public CryptoController(ApplicationDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
 
         // GET: Crypto
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var numberOfPosts = 10;
-
-            var dbTopPosts = await _context.Post
+            var posts = _context.Post
                 .OrderByDescending(post => post.CreatedAt)
-                .Take(numberOfPosts)
-                .ToListAsync();
-
-            foreach(var post in dbTopPosts)
-            {
-                posts.Add(new PostViewModel
+                .Take(NUMBER_OF_POSTS)
+                .Select(post => new PostViewModel
                 {
                     Title = post.PostName,
                     PostedAt = post.PostedAt,
                     URL = post.PostURL
-                });
-            }
+                }).ToList();
 
             return View(posts);
         }
+
         // GET: Search
-        public async Task<IActionResult> ShowSearchForm()
+        public IActionResult ShowSearchForm()
         {
             return View("ShowSearchForm");
         }
 
         // POST: Crypto/ShowSearchResults
-        public async Task<IActionResult> ShowSearchResults(String SearchPhrase)
+        [HttpPost]
+        public IActionResult ShowSearchResults(string searchPhrase)
         {
-            var searchedPosts = await _context.Post
-                .Where(j => j.PostName
-                .Contains(SearchPhrase))
-                .ToListAsync();
-
-            foreach (var post in searchedPosts)
-            {
-                posts.Add(new PostViewModel
+            var posts = _context.Post
+                .Where(post => post.PostName.Contains(searchPhrase))
+                .OrderByDescending(post => post.CreatedAt)
+                .Select(post => new PostViewModel
                 {
                     Title = post.PostName,
                     PostedAt = post.PostedAt,
                     URL = post.PostURL
-                });
-            }
+                }).ToList();
 
             return View(posts);
         }
