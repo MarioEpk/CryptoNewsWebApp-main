@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Reddit;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Crypto.Models.Data;
 using Crypto.Models;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 
 namespace Crypto.DataHandling.APIClients
 {
@@ -19,9 +16,8 @@ namespace Crypto.DataHandling.APIClients
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
 
-        public string redditAppId;
-        public string redditAppSecret;
-        public string redditRefreshToken;
+        private const string NAME_OF_SUBREDDIT = "Cardano";
+        private const int NUMBER_OF_POSTS = 10;
 
         public CardanoRedditClient(ApplicationDbContext context, ILogger logger)
         {
@@ -29,13 +25,18 @@ namespace Crypto.DataHandling.APIClients
             _context = context;
             try
             {
-                LoadCredentials();
-                // Prerobit RedditClient na autofac
-                _client = new RedditClient(appId: redditAppId, appSecret: redditAppSecret, refreshToken: redditRefreshToken);
-
+                RedditCredentials credentials = CryptoHelper.LoadRedditCredentials(_logger);
+                if (credentials != null)
+                {
+                    _client = new RedditClient(appId: credentials.redditAppId, appSecret: credentials.redditAppSecret, refreshToken: credentials.redditRefreshToken);
+                } else
+                {
+                    throw new Exception("Could not load credentials.");
+                }
             }
-            catch (TimeoutException exception)
+            catch (Exception exception)
             {
+                _logger.Error(exception.Message);
                 throw exception;
             }
         }
@@ -43,17 +44,13 @@ namespace Crypto.DataHandling.APIClients
         ///  Loads Data through the Reddit API
         /// </summary>
         /// <returns>DataSource object</returns>
-        public DataSource LoadData()
+        public async Task<DataSource> LoadData()
         {
             _logger.Debug("Fetching Data from the Reddit API...");
 
-            DataSource subreddit;
-            string nameOfSubreddit = "Cardano";
-            int numberOfPosts = 10;
+            var cryptoSubRedditPosts = _client.Subreddit(NAME_OF_SUBREDDIT).Posts.Hot;
 
-            var cryptoSubRedditPosts = _client.Subreddit(nameOfSubreddit).Posts.Hot;
-
-            subreddit = new DataSource
+            DataSource subreddit = new DataSource
             {
                 Posts = cryptoSubRedditPosts.Select(s => new Post
                 {
@@ -64,7 +61,8 @@ namespace Crypto.DataHandling.APIClients
                     CreatedAt = DateTime.Now,
                     // PostedAt points to the date the original reddit post was created
                     PostedAt = s.Created
-                }).Take(numberOfPosts).ToList(),
+                }).Take(NUMBER_OF_POSTS)
+                .ToList(),
 
                 Name = "CardanoReddit",
                 CreatedAt = DateTime.Now,
@@ -72,8 +70,10 @@ namespace Crypto.DataHandling.APIClients
             };
 
             _logger.Debug("Data fetched.");
-            return subreddit;
+
+            return await Task.FromResult(subreddit);
         }
+
         /// <summary>
         /// Saves the DataSource object into the database
         /// </summary>
@@ -81,14 +81,8 @@ namespace Crypto.DataHandling.APIClients
         /// <returns></returns>
         public async Task SaveDataToDatabase(DataSource source)
         {
-            //var postsAlreadyInDatabase = _context.Post.AsQueryable<Post>();
 
             var existingPostIDs = _context.Post.Select(p => p.ServerID);
-
-            // filter the Posts in the DataSource source object, so only posts with unique ServerID are saved to the database    
-            //source.Posts = source.Posts
-            //    .Where(x => !postsAlreadyInDatabase.Any(y => y.ServerID.Equals(x.ServerID)))
-            //    .ToList();
 
             source.Posts = source.Posts
                 .Where(p => !existingPostIDs.Contains(p.ServerID))
@@ -100,38 +94,21 @@ namespace Crypto.DataHandling.APIClients
             _logger.Debug("Reddit data saved into the database.");
         }
 
-        // Loads reddit application credentials from file
-        private void LoadCredentials()
-        {
-            try
-            {
-                var redditCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
-                Credentials credentials = JsonConvert.DeserializeObject<Credentials>(redditCredentials);
-
-                redditAppId = credentials.redditCredentials.redditAppId;
-                redditAppSecret = credentials.redditCredentials.redditAppSecret;
-                redditRefreshToken = credentials.redditCredentials.redditRefreshToken;
-            }
-            catch (FileNotFoundException e)
-            {
-                Console.WriteLine(e.Message);
-
-            }
-            catch (UnauthorizedAccessException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            catch (IOException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }
-
         public async Task ClearOldEntries()
         {
-            var oldRedditPosts = _context.Post.Where(post => post.CreatedAt < DateTime.Now.AddMonths(-1));
+            var oldDataSourceEntry = _context.DataSource
+                .Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-3))
+                .Include(d => d.Posts);
 
-            var oldDataSourceEntry = _context.DataSource.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
+            var oldRedditPosts = oldDataSourceEntry
+                .SelectMany(d => d.Posts);
+
+            await oldRedditPosts.ForEachAsync(post =>
+            {
+               _context.Remove(post);
+            });
+
+            _logger.Debug("Old Reddit posts deleted from database");
 
             await oldDataSourceEntry.ForEachAsync(datasource =>
             {
@@ -140,13 +117,8 @@ namespace Crypto.DataHandling.APIClients
 
             _logger.Debug("Old datasource entries deleted from database");
 
-            await oldRedditPosts.ForEachAsync(post =>
-             {
-                 _context.Remove(post);
-             });
-
             await _context.SaveChangesAsync();
-            _logger.Debug("Old Reddit posts deleted from database");
+           
         }
 
     }

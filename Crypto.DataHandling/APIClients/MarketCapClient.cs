@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -9,12 +8,12 @@ using Newtonsoft.Json;
 using System.Linq;
 using Serilog;
 using Crypto.Models.Data;
-using Newtonsoft.Json.Linq;
 
 namespace Crypto.DataHandling.APIClients
 {
     public class MarketCapClient : IDataAccess
     {
+
         private const string API_ENDPOINT = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest";
         private string coinMarketcapApiKey;
 
@@ -29,20 +28,29 @@ namespace Crypto.DataHandling.APIClients
 
             try
             {
-                LoadCredentials();
+                CoinmarketcapCredentials credentials = CryptoHelper.LoadCoinmarketcapCredentials(_logger);
+
+                if (credentials != null)
+                {
+                    coinMarketcapApiKey = credentials.coinmarketcapApiKey;
+                } else
+                {
+                    throw new Exception("Could not load credentials.");
+                }
             }
-            catch (TimeoutException exception)
+            catch (Exception exception)
             {
+                _logger.Error(exception.Message);
                 throw exception;
             }
         }
 
-        public DataSource LoadData()
+        public async Task<DataSource> LoadData()
         {
             _logger.Debug("Fetching data from the CMC API...");
 
-            var marketcapCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
-            var response = JsonConvert.DeserializeObject<ClientResponse>(GetCardanoJson(coinMarketcapApiKey));
+            var json = await GetCardanoJson(coinMarketcapApiKey);
+            var response = JsonConvert.DeserializeObject<ClientResponse>(json);
 
             CMCCoin coin = new CMCCoin
             {
@@ -63,21 +71,21 @@ namespace Crypto.DataHandling.APIClients
             return cardanoCoin;
         }
 
-        private string GetCardanoJson(string apiKey)
+        private async Task<string> GetCardanoJson(string apiKey)
         {
-            var URL = new UriBuilder(API_ENDPOINT);
+            var url = new UriBuilder(API_ENDPOINT);
 
             var queryString = HttpUtility.ParseQueryString(string.Empty);
             queryString["id"] = "2010";
             queryString["convert"] = "USD";
 
-            URL.Query = queryString.ToString();
+            url.Query = queryString.ToString();
 
             var client = new WebClient();
             client.Headers.Add("X-CMC_PRO_API_KEY", apiKey);
             client.Headers.Add("Accepts", "application/json");
 
-            return client.DownloadString(URL.ToString());
+            return await client.DownloadStringTaskAsync(url.ToString());
         }
 
         public async Task SaveDataToDatabase(DataSource source)
@@ -88,32 +96,13 @@ namespace Crypto.DataHandling.APIClients
             _logger.Debug("CMC data saved into the database.");
         }
 
-        private void LoadCredentials()
-        {
-            try
-            {
-                var marketCapCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
-                Credentials credentials = JsonConvert.DeserializeObject<Credentials>(marketCapCredentials);
-
-                coinMarketcapApiKey = credentials.coinmarketcapCredentials.coinmarketcapApiKey;
-            }
-            catch (FileNotFoundException)
-            {
-                _logger.Error("The file or directory cannot be found.");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                _logger.Error("You do not have permission to access this file.");
-            }
-            catch (IOException)
-            {
-                _logger.Error("An unexpected error occured while loading the Reddit app credentials");
-            }
-        }
-
         public async Task ClearOldEntries()
         {
-            var oldDataSourceEntry = _context.DataSource.Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-1));
+            var oldDataSourceEntry = _context.DataSource
+                .Where(datasource => datasource.CreatedAt < DateTime.Now.AddMonths(-3));
+
+            var oldCMCCoins = oldDataSourceEntry
+                .Select(d => d.Coin);
 
             await oldDataSourceEntry.ForEachAsync(datasource =>
             {
@@ -122,8 +111,6 @@ namespace Crypto.DataHandling.APIClients
 
             _logger.Debug("Old datasource entries deleted from database");
 
-
-            var oldCMCCoins = _context.Coin.Where(coin => coin.CreatedAt < DateTime.Now.AddMonths(-1));
             await oldCMCCoins.ForEachAsync(coin =>
             {
                 _context.Remove(coin);

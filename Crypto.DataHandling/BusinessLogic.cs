@@ -19,15 +19,9 @@ namespace Crypto.DataHandling
 
         public async Task ProcessData()
         {
-            //dataAccesses.ForEach(async dataAccess =>
-            //{
-            //    var data = dataAccess.LoadData();
-            //    await dataAccess.SaveDataToDatabase(data);
-            //});
-
             foreach (IDataAccess dataAccess in dataAccesses)
             {
-                var data = dataAccess.LoadData();
+                var data = await dataAccess.LoadData();
                 await dataAccess.SaveDataToDatabase(data);
                 await dataAccess.ClearOldEntries();
             }
