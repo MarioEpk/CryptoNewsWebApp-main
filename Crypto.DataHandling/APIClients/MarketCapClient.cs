@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 using System.Net;
 using System.Web;
 using Crypto.Models;
@@ -12,12 +9,12 @@ using Newtonsoft.Json;
 using System.Linq;
 using Serilog;
 using Crypto.Models.Data;
+using Newtonsoft.Json.Linq;
 
 namespace Crypto.DataHandling.APIClients
 {
     public class MarketCapClient : IDataAccess
     {
-        private const string CREDENTIALS_FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\Crypto.DataHandling\CoinMarketCapCredentials.txt";
         private const string API_ENDPOINT = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest";
         private string coinMarketcapApiKey;
 
@@ -43,6 +40,8 @@ namespace Crypto.DataHandling.APIClients
         public DataSource LoadData()
         {
             _logger.Debug("Fetching data from the CMC API...");
+
+            var marketcapCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
             var response = JsonConvert.DeserializeObject<ClientResponse>(GetCardanoJson(coinMarketcapApiKey));
 
             CMCCoin coin = new CMCCoin
@@ -93,8 +92,10 @@ namespace Crypto.DataHandling.APIClients
         {
             try
             {
-                var credentials = File.ReadAllLines(CREDENTIALS_FILE_PATH);
-                coinMarketcapApiKey = credentials[0];
+                var marketCapCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
+                Credentials credentials = JsonConvert.DeserializeObject<Credentials>(marketCapCredentials);
+
+                coinMarketcapApiKey = credentials.coinmarketcapCredentials.coinmarketcapApiKey;
             }
             catch (FileNotFoundException)
             {

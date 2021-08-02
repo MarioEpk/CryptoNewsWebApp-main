@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Crypto.Models.Data;
 using Crypto.Models;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Crypto.DataHandling.APIClients
 {
@@ -16,8 +18,6 @@ namespace Crypto.DataHandling.APIClients
         private readonly RedditClient _client;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-
-        const string FILE_PATH = @"C:\Users\Epakf\source\repos\CryptoNewsWebApp-main\Crypto.DataHandling\RedditCredentials.txt";
 
         public string redditAppId;
         public string redditAppSecret;
@@ -105,11 +105,12 @@ namespace Crypto.DataHandling.APIClients
         {
             try
             {
-                var credentials = File.ReadAllLines(FILE_PATH);
+                var redditCredentials = File.ReadAllText((Path.Combine(Directory.GetCurrentDirectory(), "Credentials.json")));
+                Credentials credentials = JsonConvert.DeserializeObject<Credentials>(redditCredentials);
 
-                redditAppId = credentials[0];
-                redditAppSecret = credentials[1];
-                redditRefreshToken = credentials[2];
+                redditAppId = credentials.redditCredentials.redditAppId;
+                redditAppSecret = credentials.redditCredentials.redditAppSecret;
+                redditRefreshToken = credentials.redditCredentials.redditRefreshToken;
             }
             catch (FileNotFoundException e)
             {
