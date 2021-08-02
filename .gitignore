@@ -342,3 +342,6 @@ healthchecksdb
 #Credentials
 RedditCredentials.txt
 CoinMarketCapCredentials.txt
+
+#Tests
+/Tests
