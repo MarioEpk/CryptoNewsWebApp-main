@@ -344,4 +344,4 @@ RedditCredentials.txt
 CoinMarketCapCredentials.txt
 
 #Tests
-/Tests
+Tests/
