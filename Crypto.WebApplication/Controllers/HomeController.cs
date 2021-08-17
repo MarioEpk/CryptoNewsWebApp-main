@@ -1,4 +1,5 @@
 ﻿using Crypto.Models.Data;
+using Crypto.Models.Models;
 using Crypto.WebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,6 +21,14 @@ namespace Crypto.WebApplication.Controllers
 
         public IActionResult Index()
         {
+            // Get list of prices for Chart.js
+
+            var listOfCardanoPrices = _context.Coin
+                .Select(coin => new ChartItem { Date = coin.CreatedAt, Price = coin.Price })
+                .ToList();
+
+            // Get the latest cardano price
+
             var latestCardanoCoin = _context.Coin
                 .Where(coin => coin.Name.Equals(CryptoConstants.CARDANO_NAME))
                 .OrderByDescending(coin => coin.CreatedAt)
@@ -29,10 +38,13 @@ namespace Crypto.WebApplication.Controllers
             {
                 CMCRank = latestCardanoCoin.CMCRank,
                 LatestPrice = latestCardanoCoin.Price,
-                Name = latestCardanoCoin.Name
+                Name = latestCardanoCoin.Name,
+                Prices = listOfCardanoPrices
             };
 
+
             return View(cardano);
+
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
